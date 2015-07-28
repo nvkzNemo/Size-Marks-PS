@@ -15,12 +15,19 @@
  */
 
 
+
 var doc = null,
-    lyrs = undefined,
-    smset = undefined,
+    firstLevelLayers = undefined,
+    smFolder = undefined,
     docIsExist = false,
     selBounds = null,
-    selIsExist = false;
+    selIsExist = false,
+    probableNames = ["sizemarks", 
+                     "size marks", 
+                     "size-marks", 
+                     "sizemark", 
+                     "size mark", 
+                     "size-mark"];
 
 var store = {
     activeLayer: null,
@@ -35,7 +42,7 @@ app.preferences.typeUnits = TypeUnits.POINTS;
 
 try {
     doc = app.activeDocument;
-    lyrs = doc.layers;
+    firstLevelLayers = doc.layers;
     docIsExist = true;
 } catch (e) {
     alert('Size Marks Script: no document\n' +
@@ -54,19 +61,13 @@ if (docIsExist) {
 }
 
 
-if (docIsExist && selIsExist) {
-    doc.suspendHistory("Add SizeMark", "makeSizeMark()");
-}
-
-
 function makeSizeMark() {
 
-    for (var i = 0; i < lyrs.length; i++) {
-        if (lyrs[i].name == "SizeMarks") {
-            smset = lyrs[i];
+    for (var i = 0; i < firstLevelLayers.length; i++) {
+        if (probableNames.indexOf(firstLevelLayers[i].name.toLowerCase()) > -1) {
+            smFolder = firstLevelLayers[i];
         }
     }
-    
 
     var halfMark = 3,
         txtMargin = 5,
@@ -130,9 +131,9 @@ function makeSizeMark() {
     }
 
     markLayer.opacity = 85;
-    
-    if (smset) {
-        markLayer.move(smset, ElementPlacement.INSIDE);
+
+    if (smFolder) {
+        markLayer.move(smFolder, ElementPlacement.INSIDE);
     } else {
         markLayer.move(store.activeLayer, ElementPlacement.PLACEBEFORE);
     }
@@ -278,4 +279,19 @@ function makeSizeMark() {
         desc2.putObject(idT, idBrsh, desc3);
         executeAction(idsetd, desc2, DialogModes.NO);
     }
+}
+
+
+// indexOf
+if (typeof Array.prototype.indexOf != "function") {
+    Array.prototype.indexOf = function (el) {
+        for (var i = 0; i < this.length; i++)
+            if (el === this[i]) return i;
+        return -1;
+    }
+}
+
+
+if (docIsExist && selIsExist) {
+    doc.suspendHistory("Add SizeMark", "makeSizeMark()");
 }
