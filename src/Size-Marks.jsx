@@ -66,6 +66,7 @@ function makeSizeMark() {
     for (var i = 0; i < firstLevelLayers.length; i++) {
         if (probableNames.indexOf(firstLevelLayers[i].name.toLowerCase()) > -1) {
             smFolder = firstLevelLayers[i];
+            break;
         }
     }
 
