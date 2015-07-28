@@ -16,6 +16,8 @@
 
 
 var doc = null,
+    lyrs = undefined,
+    smset = undefined,
     docIsExist = false,
     selBounds = null,
     selIsExist = false;
@@ -33,6 +35,7 @@ app.preferences.typeUnits = TypeUnits.POINTS;
 
 try {
     doc = app.activeDocument;
+    lyrs = doc.layers;
     docIsExist = true;
 } catch (e) {
     alert('Size Marks Script: no document\n' +
@@ -57,6 +60,14 @@ if (docIsExist && selIsExist) {
 
 
 function makeSizeMark() {
+
+    for (var i = 0; i < lyrs.length; i++) {
+        if (lyrs[i].name == "SizeMarks") {
+            smset = lyrs[i];
+        }
+    }
+    
+
     var halfMark = 3,
         txtMargin = 5,
         baseRes = 72,
@@ -119,7 +130,12 @@ function makeSizeMark() {
     }
 
     markLayer.opacity = 85;
-    markLayer.move(store.activeLayer, ElementPlacement.PLACEBEFORE);
+    
+    if (smset) {
+        markLayer.move(smset, ElementPlacement.INSIDE);
+    } else {
+        markLayer.move(store.activeLayer, ElementPlacement.PLACEBEFORE);
+    }
 
     // Draw label
     var txtLayer = makeTextLayer(),
@@ -158,7 +174,7 @@ function makeSizeMark() {
     app.preferences.typeUnits = store.typeUnits;
 
     pickTool('marqueeRectTool');
-    
+
     // HELPERS
 
     function makePoint(pnt) {
@@ -204,7 +220,7 @@ function makeSizeMark() {
         line.strokePath(ToolType.PENCIL);
         line.remove();
     }
-    
+
 
     function pickTool(toolName) {
         var idslct = charIDToTypeID('slct');
